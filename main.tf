@@ -18,13 +18,6 @@ data "template_file" "wg_client_data_json" {
   }
 }
 
-data "template_cloudinit_config" "config" {
-  part {
-    content_type = "text/cloud-config"
-    content      = data.template_file.user_data.rendered
-  }
-}
-
 resource "aws_eip" "wireguard_eip" {
   vpc = true
 }
@@ -35,7 +28,7 @@ resource "aws_launch_configuration" "wireguard_launch_config" {
   instance_type               = "t2.micro"
   key_name                    = var.ssh_key_id
   iam_instance_profile        = aws_iam_instance_profile.wireguard_profile.name
-  user_data                   = data.template_cloudinit_config.config.rendered
+  user_data                   = data.template_file.user_data.rendered
   security_groups             = [aws_security_group.sg_wireguard_external.id]
   associate_public_ip_address = true
 
